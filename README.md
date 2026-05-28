@@ -12,8 +12,6 @@ This utility reads a list of target Global IDs (GUIDs) from an Excel spreadsheet
   - Material mappings
   - Empty parent relationships
 - **Recursive Decomposition:** Automatically traverses hierarchical structures (like `IfcElementAssembly`). Removing an assembly will recursively find and delete its sub-components (such as beams, columns, plates, and fasteners) to ensure no ghost geometry is left behind in BIM viewers.
-- **Robust Memory Handling:** Performs checks using `model.by_id()` before deleting, preventing duplicate deletion attempts which crash the Python/C++ interface wrapper.
-- **Custom Excel Parsing:** Configured to easily adjust column and row offets.
 
 ---
 
@@ -48,14 +46,3 @@ All parameters are required:
 - `--ifc-out`: Path where the modified output IFC model will be saved.
 - `--sheet`: Name or index (0-based) of the Excel sheet to read.
 
-### Custom Excel Row & Column Selection
-
-If your Excel spreadsheet layout changes, you can modify the mapping parameters inside `get_guids_from_excel` in [delete_guid.py](file:///c:/Users/User/source/repos/ifc-delete-guid/delete_guid.py):
-
-```python
-def get_guids_from_excel(file_path, sheet_name=0):
-    # Read the first row (header row) without headers to find the GUID column index
-    header_df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=1, header=None)
-    # Search limit is set to first 50 columns
-    # ...
-```
