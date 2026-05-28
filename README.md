@@ -19,52 +19,43 @@ This utility reads a list of target Global IDs (GUIDs) from an Excel spreadsheet
 
 ## Requirements
 
-The utility requires **Python 3** and the following dependencies:
+The utility requires **Python 3** and is configured to run with `uv`.
 
+The dependencies are:
 - `ifcopenshell` (IFC parsing library)
 - `pandas` (Excel reading)
 - `openpyxl` (Engine dependency for Pandas to read `.xlsx` files)
-
-You can install the dependencies using:
-
-```bash
-pip install pandas openpyxl ifcopenshell
-```
 
 ---
 
 ## Usage
 
-### 1. Configuration
+You can run the utility directly via `uv run` without manually managing a virtual environment or installing packages.
 
-Open [deleteGuid.py](file:///c:/Users/User/source/repos/bsc_scripts/deleteGUID/deleteGuid.py) and configure the local file paths inside the `__main__` block at the bottom of the script:
+### Run the Utility
 
-```python
-if __name__ == "__main__":
-    # Define local file paths
-    EXCEL_PATH = r"C:\Users\User\Downloads\UKH GUIDS ALL.xlsx"
-    INPUT_IFC_PATH = r"C:\Users\User\Downloads\260511_CP_Produktion.ifc"
-    OUTPUT_IFC_PATH = "test.ifc"
+Open your terminal, navigate to the repository directory, and run the script with the required CLI arguments:
+
+```powershell
+uv run delete-guid --excel "C:\path\to\your\file.xlsx" --ifc-in "C:\path\to\input.ifc" --ifc-out "C:\path\to\output.ifc" --sheet 0
 ```
 
-### 2. Custom Excel Row & Column Selection
+### Command-Line Arguments
 
-If your Excel spreadsheet layout changes, you can modify the mapping parameters inside `get_guids_from_excel`:
+All parameters are required:
+- `--excel`: Path to the Excel spreadsheet (`.xlsx`) containing target GUIDs.
+- `--ifc-in`: Path to the source input IFC model file.
+- `--ifc-out`: Path where the modified output IFC model will be saved.
+- `--sheet`: Name or index (0-based) of the Excel sheet to read.
+
+### Custom Excel Row & Column Selection
+
+If your Excel spreadsheet layout changes, you can modify the mapping parameters inside `get_guids_from_excel` in [delete_guid.py](file:///c:/Users/User/source/repos/ifc-delete-guid/delete_guid.py):
 
 ```python
 def get_guids_from_excel(file_path, sheet_name=0):
-    # skiprows=1: Skips row 1 (header), starts reading from Row 2.
-    # usecols="D": Targets column D (where GUIDs reside).
-    df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=1, usecols="D")
-    return df.iloc[:, 0].dropna().astype(str).tolist()
+    # Read the first row (header row) without headers to find the GUID column index
+    header_df = pd.read_excel(file_path, sheet_name=sheet_name, nrows=1, header=None)
+    # Search limit is set to first 50 columns
+    # ...
 ```
-
-### 3. Run the Utility
-
-Open your terminal or command line, navigate to the repository directory, and run the script:
-
-```powershell
-python deleteGUID\deleteGuid.py
-```
-
-Upon successful completion, a status report will print the total counts, and the processed model will be saved to your specified output path (e.g., `test.ifc`).

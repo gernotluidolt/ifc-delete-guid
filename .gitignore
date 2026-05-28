@@ -1,3 +1,5 @@
 __pycache__/
 *.ifc
 *.xlsx
+.venv/
+*.egg-info/
